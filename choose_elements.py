@@ -70,13 +70,13 @@ def choose_elements():
 if __name__ == "__main__":
     elements, magnet_type = choose_elements()
     if elements:
-        optimal_diameters_info, optimal_pressure = find_optimal_diameters(elements)
+        optimal_diameters_info, optimal_pressure = find_optimal_diameters(elements, magnet_type)
         if optimal_diameters_info:
-            print("\nOptimal Diameters and Types:")
+            print("\nOptimal Diameters:")
             for diameter_mm, element_type, length, angle in optimal_diameters_info:
                 diameter_inch = mm_to_inch(diameter_mm)
                 if length:
-                    length_display = f"- {m_to_inch(length)} inches ({length} m)"
+                    length_display = f"- {m_to_inch(round(length,2))} inches ({round(length,2)} m)"
                     print(f"{diameter_inch} inch ({diameter_mm} mm) - {element_type} {length_display}")
                 else:
                     print(f"{diameter_inch} inch ({diameter_mm} mm) - {element_type} - {angle}°")

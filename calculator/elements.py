@@ -1,3 +1,4 @@
+import sys
 from calculator.constants import (
     TUBE_TYPES, 
     COEFFICIENTS_LESS_EQUAL_200, 
@@ -97,9 +98,18 @@ class Element(BaseElement):
             fitting_params = FITTING_PARAMETERS['flexible'] if self.element_type == "straight flexible" else FITTING_PARAMETERS['smooth']
         
         index = 1 if self.element_type == "straight flexible" else 0
-
-        P_L_prime = ((((((coefficients['6th order'][index] * L_prime + coefficients['5th order'][index]) * L_prime + coefficients['4th order'][index]) * L_prime + coefficients['3rd order'][index]) * L_prime + coefficients['2nd order'][index]) * L_prime + coefficients['1st order'][index]) * L_prime) ** (1 / fitting_params['P2']) / (self.diameter * 0.001) ** fitting_params['P1']
-
+    
+        # Calculate the polynomial result
+        polynomial_result = ((((((coefficients['6th order'][index] * L_prime + coefficients['5th order'][index]) * L_prime + coefficients['4th order'][index]) * L_prime + coefficients['3rd order'][index]) * L_prime + coefficients['2nd order'][index]) * L_prime + coefficients['1st order'][index]) * L_prime)
+    
+        # Check for overflow
+        if polynomial_result > 1e308:  # This is close to the maximum value for a float in Python
+            print("---------------------------------")
+            print("Warning: Pressure exceeds 100 mbar. No available pipe diameters for this run.")
+            sys.exit(1)  # Exit the program with a status code of 1 indicating an error
+            
+        P_L_prime = (polynomial_result ** (1 / fitting_params['P2'])) / (self.diameter * 0.001) ** fitting_params['P1']
+    
         return P_L_prime
 
     def get_P_L_prime_plus_L(self, L_prime):
